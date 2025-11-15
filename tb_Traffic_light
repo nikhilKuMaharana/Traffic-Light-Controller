@@ -1,0 +1,47 @@
+module tb_traffic_light;
+
+    reg clk;
+    reg rst;
+    wire ns_red, ns_yellow, ns_green;
+    wire ew_red, ew_yellow, ew_green;
+
+    // For simulation we use small cycle counts so sim finishes quickly
+    // (override the defaults) - e.g., NS green = 20 cycles, yellow = 6, etc.
+    traffic_light #(
+        .CNT_WIDTH(16),
+        .NS_GREEN_CYCLES(20),
+        .NS_YELLOW_CYCLES(6),
+        .EW_GREEN_CYCLES(14),
+        .EW_YELLOW_CYCLES(6)
+    ) dut (
+        .clk(clk),
+        .rst(rst),
+        .ns_red(ns_red),
+        .ns_yellow(ns_yellow),
+        .ns_green(ns_green),
+        .ew_red(ew_red),
+        .ew_yellow(ew_yellow),
+        .ew_green(ew_green)
+    );
+
+    // 10 ns clock -> 100 MHz (only for sim; real frequency depends on your platform)
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("tb_traffic_light.vcd");
+        $dumpvars(0, tb_traffic_light);
+
+        // reset sequence
+        rst = 1;
+        #20;
+        rst = 0;
+
+        // run for some cycles to observe several full cycles
+        #5000;
+
+        $display("Simulation completed");
+        $finish;
+    end
+
+endmodule
